@@ -1,0 +1,68 @@
+name: Update apt cache
+name: Install pm2 globally
+npm:
+name: pm2
+global: yes
+
+
+name: Clone MERN app repo
+git:
+repo: 'https://github.com/your-username/your-mern-repo.git'
+dest: /home/ubuntu/mernapp
+version: main
+update: yes
+
+
+name: Install node dependencies (backend)
+command: npm install
+args:
+chdir: /home/ubuntu/mernapp/backend
+
+
+name: Build React frontend
+command: npm install && npm run build
+args:
+chdir: /home/ubuntu/mernapp/frontend
+
+
+name: Create .env for backend
+copy:
+dest: /home/ubuntu/mernapp/backend/.env
+content: |
+PORT=3000
+MONGO_URI=mongodb://admin:password@{{ hostvars[groups['db'][0]]['ansible_host'] }}:27017/yourdb?authSource=admin
+
+
+name: Start backend with pm2
+command: pm2 start npm --name "mern-backend" -- start
+args:
+chdir: /home/ubuntu/mernapp/backend
+
+
+name: Start static server for frontend (optional - serve build)
+npm:
+path: /home/ubuntu/mernapp/frontend
+production: yes
+when: false
+
+
+# Optionally configure nginx to serve frontend and reverse proxy API
+name: Install nginx
+apt: { name: nginx, state: present }
+
+
+name: Template nginx config
+template:
+src: nginx/mern_site.j2
+dest: /etc/nginx/sites-available/mern
+
+
+name: Enable nginx site
+file:
+src: /etc/nginx/sites-available/mern
+dest: /etc/nginx/sites-enabled/mern
+state: link
+
+
+name: Ensure nginx is running
+service: name=nginx state=started enabled=yes

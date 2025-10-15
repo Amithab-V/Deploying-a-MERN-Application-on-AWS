@@ -1,0 +1,13 @@
+hosts: web
+roles:
+role: web
+
+
+hosts: db
+roles:
+role: db
+
+
+hosts: web
+tasks:
+include: hardening.yml

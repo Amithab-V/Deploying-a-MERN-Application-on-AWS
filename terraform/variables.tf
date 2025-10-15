@@ -1,0 +1,9 @@
+variable "region" { default = "us-east-1" }
+variable "vpc_cidr" { default = "10.0.0.0/16" }
+variable "public_subnet_cidr" { default = "10.0.1.0/24" }
+variable "private_subnet_cidr" { default = "10.0.2.0/24" }
+variable "instance_type_web" { default = "t3.micro" }
+variable "instance_type_db" { default = "t3.micro" }
+variable "key_name" { description = "Existing EC2 key pair name to use" }
+variable "my_ip" { description = "Your public IP (for SSH) e.g. 1.2.3.4/32" }
+variable "ami_ubuntu" { description = "Ubuntu AMI id (region-specific)" }
